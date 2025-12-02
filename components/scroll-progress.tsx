@@ -9,14 +9,21 @@ export function ScrollProgress() {
     const updateProgress = () => {
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
       const scrolled = window.scrollY
-      const progress = (scrolled / scrollHeight) * 100
-      setProgress(progress)
+      const percent = (scrolled / scrollHeight) * 100
+      setProgress(percent)
     }
 
-    window.addEventListener("scroll", updateProgress)
-    updateProgress()
+    // ❗ SSR/Hydration scroll jump fix
+    // İlk frame geçtikten sonra çalıştırıyoruz:
+    const timeout = setTimeout(() => {
+      updateProgress()
+      window.addEventListener("scroll", updateProgress)
+    }, 10)
 
-    return () => window.removeEventListener("scroll", updateProgress)
+    return () => {
+      clearTimeout(timeout)
+      window.removeEventListener("scroll", updateProgress)
+    }
   }, [])
 
   return (
