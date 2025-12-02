@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 
 export function TerminalContact() {
   const [command, setCommand] = useState("")
@@ -11,6 +10,17 @@ export function TerminalContact() {
     "Type 'help' to see available commands",
     "",
   ])
+
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Güvenli focus (scroll jump YAPMAZ)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      inputRef.current?.focus()
+    }, 50) // küçük bir delay en stabil yöntemdir
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const commands: Record<string, string> = {
     help: "Available commands: email, github, linkedin, location, clear",
@@ -58,12 +68,12 @@ export function TerminalContact() {
       <form onSubmit={handleSubmit} className="flex gap-2">
         <span className="text-green-400">$</span>
         <input
+          ref={inputRef}
           type="text"
           value={command}
           onChange={(e) => setCommand(e.target.value)}
           className="flex-1 bg-transparent border-none outline-none text-green-400"
           placeholder="Type a command..."
-          autoFocus
         />
       </form>
     </div>
